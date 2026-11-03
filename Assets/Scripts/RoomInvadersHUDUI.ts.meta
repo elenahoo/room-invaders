@@ -1,0 +1,60 @@
+- !<AssetImportMetadata/55ec904b-e64f-475f-b298-4019afb73825>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 2aa18301-6654-4ac9-9a04-43f65b6ba79f
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 2aa18301-6654-4ac9-9a04-43f65b6ba79f
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> ce6f3e30-2ec0-4996-903e-dd40a816b61e
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/ce6f3e30-2ec0-4996-903e-dd40a816b61e>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: c9c2c20f-71d9-415c-8ab5-e36080d32979
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    readyMessage: false
+    textColor: false
+    textScale: false
+    title: false
+    width: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - width: !<float> 60.000000
+      textScale: !<float> 1.000000
+      title: ROOM INVADERS
+      readyMessage: Point at a creature. Pinch to zap. Save Pip!
+      textColor: !<Vec4> {x: 0.800000, y: 1.000000, z: 0.980000, w: 1.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"Room Invaders — world-space controls"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @input float width = 60 {"hint":"Panel width in centimeters", "widget":"slider", "min":42, "max":75, "step":1}'
+    - '// @input float textScale = 1.2 {"hint":"Scale the shared typography roles", "widget":"slider", "min":0.8, "max":1.4, "step":0.05}'
+    - '// @input string title = "ROOM INVADERS" {"hint":"Title shown over the encounter"}'
+    - '// @input string readyMessage = "Point at a creature. Pinch to zap. Save Pip!" {"hint":"Initial instruction"}'
+    - '// @input vec4 textColor = "{0.8,1,0.98,1}" {"hint":"Bright guidance color", "widget":"color"}'

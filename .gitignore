@@ -1,0 +1,17 @@
+Cache/
+Support/
+Workspaces/
+PluginsUserPreferences/
+*.pem
+*.lock
+.DS_Store
+.codex/
+.claude/
+.cursor/
+.vscode/
+.mcp.json
+tempAssetGen/
+leaf_plugin_settings.json
+.cursor*
+AGENTS.md
+CLAUDE.md
