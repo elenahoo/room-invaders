@@ -24,7 +24,7 @@ export class RoomInvadersAutoScan {
   private index=0;
   private samples:SurfaceSample[]=[];
   private scanningSince=0;
-  constructor(){for(const y of [0.93,0.96,0.9,0.84,0.78,0.72,0.65])for(const x of [0.2,0.35,0.5,0.65,0.8])this.grid.push(new vec2(x,y));this.reset();}
+  constructor(){for(const y of [0.8,0.5,0.2,0.95,0.65,0.35])for(const x of [0.2,0.35,0.5,0.65,0.8])this.grid.push(new vec2(x,y));this.reset();}
   reset():void {this.floorY=null;this.observations=0;this.index=0;this.samples=[];this.scanningSince=getTime();}
   next():vec2 {return this.grid[this.index++%this.grid.length];}
   accept(position:vec3,normal:vec3,camera:vec3):void {

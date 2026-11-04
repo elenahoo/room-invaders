@@ -108,3 +108,6 @@ This part is for you, after CLAD finishes.
 
 ## Implemented revisions, October 31 and November 3
 Automatic setup now counts three measured starting sites and then continues surveying. Later monsters can appear at ceiling undersides, corners, elevated surfaces and cover edges. Automatic placement supersedes the original fixed near/far arrangement. Manual placement retains the near/far bands. Speed scoring awards up to 100 extra points over the first two seconds of exposed, shootable time. Setup gives progress and recovery prompts as the player looks around.
+
+## November 4 local outdoor revision
+The authorized outdoor scan fix supplements incomplete reconstructed meshes with confirmed, bounded depth patches from actual WorldQuery samples. These patches also mask emergence and block covered shots. Nearby opaque columns and edges can now provide roaming sites after the player looks around; unknown gaps and glass are not filled with invented geometry. Pip and the three locks are checked for clearance in front of measured cover. The local demo now retains the earlier indoor footage and appends a Sunlit Outdoor chapter, with the game’s own event-timed music/effects. Physical-glasses verification remains outstanding. No publication, submission or spending is authorized.

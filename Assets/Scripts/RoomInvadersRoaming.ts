@@ -45,13 +45,21 @@ export class RoomInvadersRoaming {
   if(kind)this.add(p,n,kind);
   if(ground!==null)this.sites=this.sites.filter(s=>s.n.y<=.5||s.p.y>ground+22);
  }
- placeRescue(rescue:SceneObject,camera:vec3):boolean{
-  const site=this.sites.filter(s=>s.kind!=='ceiling'&&s.p.y<camera.y+15&&s.p.sub(camera).length>100).sort((a,b)=>(b.n.y>.5?1:0)-(a.n.y>.5?1:0))[0];
-  if(!site)return false;
-  const point=site.p.add(site.n.uniformScale(site.n.y>.5?30:60)),t=rescue.getTransform();t.setWorldPosition(point);
-  const facing=new vec3(camera.x-point.x,0,camera.z-point.z);
-  if(facing.length>.01)t.setWorldRotation(quat.lookAt(facing.normalize(),vec3.up()));
-  return true;
+ placeRescue(rescue:SceneObject,camera:vec3,clear:(p:vec3)=>boolean):boolean{
+  const sites=this.sites.filter(s=>s.kind!=='ceiling'&&s.p.sub(camera).length>100).sort((a,b)=>(b.n.y>.5?1:0)-(a.n.y>.5?1:0));
+  for(const site of sites){
+   const toward=camera.sub(site.p).normalize();
+   // Pip floats in reachable space in front of a measured hiding place. Test the
+   // full cage, not just its center: a nearby table must not hide the lower locks.
+   for(const offset of [65,100,140]){
+    const point=site.p.add(toward.uniformScale(offset));point.y=Math.max(camera.y-45,Math.min(camera.y+5,point.y));
+    if(point.sub(camera).length<80)continue;
+    const facing=new vec3(camera.x-point.x,0,camera.z-point.z).normalize(),right=new vec3(facing.z,0,-facing.x);
+    const checks=[point,point.add(right.uniformScale(-18)).add(new vec3(0,-20,0)),point.add(new vec3(0,-20,0)),point.add(right.uniformScale(18)).add(new vec3(0,-20,0)),point.add(new vec3(0,24,0))];
+    if(!checks.every(clear))continue;
+    const t=rescue.getTransform();t.setWorldPosition(point);t.setWorldRotation(quat.lookAt(facing,vec3.up()));return true;
+   }
+  }return false;
  }
  bootstrap(placed:vec3[]=[]):RoomSite[]{
   if(!this.sites.some(s=>s.kind!=='ceiling'))return [];

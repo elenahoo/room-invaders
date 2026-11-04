@@ -3,12 +3,14 @@ import {RoomInvadersAutoScan,distanceFits} from './RoomInvadersAutoScan';
 import {SIK} from 'SpectaclesInteractionKit.lspkg/SIK';
 import {InteractorTriggerType} from 'SpectaclesInteractionKit.lspkg/Core/Interactor/Interactor';
 import WorldCameraFinderProvider from 'SpectaclesInteractionKit.lspkg/Providers/CameraProvider/WorldCameraFinderProvider';
+import {RoomInvadersDepthCover} from './RoomInvadersDepthCover';
 import {RoomInvadersRoaming} from './RoomInvadersRoaming';
 import {Snapshot} from './RoomInvadersState';
 import {surfaceMarker} from './RoomInvadersGeometry';
 export class RoomInvadersPlacement {
   private automatic=true;
   private roaming:RoomInvadersRoaming;
+  private depthCover:RoomInvadersDepthCover;
   private setupStarted=0;
   private lastProgress=0;
   private setupOrigin:vec3;private probe=0;
@@ -27,7 +29,7 @@ export class RoomInvadersPlacement {
   private note='Point at a nearby object and pinch.';
   private normal:vec3[]=[];
   constructor(private anchors:SceneObject[],private rescue:SceneObject,material:Material,parent:SceneObject) {
-    this.roaming=new RoomInvadersRoaming(anchors);
+    this.roaming=new RoomInvadersRoaming(anchors);this.depthCover=new RoomInvadersDepthCover(this.roaming);
     this.cursor=surfaceMarker(parent,material,'SurfaceCursor',[0.32,1,0.72,1]);
     for(let i=0;i<3;i++)this.marks.push(surfaceMarker(parent,material,'SurfacePoint'+(i+1),[0.66,0.34,1,1]));
     this.cursor.enabled=false;this.marks.forEach(m=>m.enabled=false);
@@ -36,19 +38,29 @@ export class RoomInvadersPlacement {
       const options=HitTestSessionOptions.create();options.filter=false;
       this.session=module.createHitTestSessionWithOptions(options);
     } catch(e) {this.note='Room sensing unavailable. Reopen in a room preview or on Specs.';console.warn('Room placement unavailable: '+e);}
+    // The renderer's WorldMesh asset alone does not reliably enable raycast tracking
+    // after switching interactive environments. Placement explicitly requests it.
+    const camera=WorldCameraFinderProvider.getInstance().getComponent();
+    const tracking=camera.getSceneObject().getComponent('Component.DeviceTracking') as DeviceTracking;
+    if(tracking)tracking.worldOptions.enableWorldMeshesTracking=true;
     this.reset();
   }
   surfaceNormal(index:number):vec3 {return this.roaming.normal(index)??this.normal[index]??vec3.up();}
   surfaceKind(index:number):string{return this.roaming.kind(index);}
   prepare(s:Snapshot):void{const camera=WorldCameraFinderProvider.getInstance().getComponent();this.roaming.sync(s,camera.getTransform().getWorldPosition(),camera.getSceneObject().getComponent('Component.DeviceTracking') as DeviceTracking);}
-  prepareRescue():void{if(this.automatic)this.roaming.placeRescue(this.rescue,WorldCameraFinderProvider.getInstance().getComponent().getTransform().getWorldPosition());}
-  roamingStatus(){return this.roaming.status();}
+  prepareRescue():void{
+    if(!this.automatic)return;
+    const camera=WorldCameraFinderProvider.getInstance().getComponent(),origin=camera.getTransform().getWorldPosition();
+    const tracking=camera.getSceneObject().getComponent('Component.DeviceTracking') as DeviceTracking;
+    this.roaming.placeRescue(this.rescue,origin,p=>{if(this.depthCover.blocked(origin,p))return false;const hits=tracking?.raycastWorldMesh(origin,p);return !hits?.length||hits[0].position.sub(origin).length+2>=p.sub(origin).length;});
+  }
+  roamingStatus(){return {...this.roaming.status(),depthPatches:this.depthCover.count};}
   get ready():boolean{return this.points.length===3;}
   status():{count:number;ready:boolean;automatic:boolean;message:string;points:number[][];distances:number[];roles:string[];scan:ReturnType<RoomInvadersAutoScan["diagnostics"]>} {
     return {scan:this.scanner.diagnostics(),count:this.points.length,ready:this.ready,automatic:this.automatic,message:this.note,points:this.points.map(p=>[p.x,p.y,p.z]),distances:this.points.map(p=>p.sub(this.setupOrigin).length/100),roles:this.points.map((_,i)=>this.automatic?'starter':i===0?'near':'far')};
   }
   reset(automatic=true):void {
-    this.automatic=automatic;this.roaming.reset();this.setupStarted=getTime();this.lastProgress=this.setupStarted;this.scanner.reset();this.probe=0;this.floorY=null;
+    this.automatic=automatic;this.roaming.reset();this.depthCover.reset();this.setupStarted=getTime();this.lastProgress=this.setupStarted;this.scanner.reset();this.probe=0;this.floorY=null;
     this.setupOrigin=WorldCameraFinderProvider.getInstance().getComponent().getTransform().getWorldPosition();
     this.epoch++;this.pending=false;this.queued=null;this.points=[];this.normal=[];this.active=!!this.session;
     this.cursor.enabled=false;this.marks.forEach(m=>m.enabled=false);
@@ -59,6 +71,7 @@ export class RoomInvadersPlacement {
     if(this.automatic&&this.session){
       const camera=WorldCameraFinderProvider.getInstance().getComponent();
       this.roaming.sample(camera,this.scanner.diagnostics().groundEstimate);
+      this.depthCover.update(camera,this.scanner.diagnostics().groundEstimate);
       if(!this.ready&&getTime()-this.setupStarted>8){
         const sites=this.roaming.bootstrap(this.points);
         for(const s of sites){
@@ -102,18 +115,21 @@ export class RoomInvadersPlacement {
   }
   private scan():void {
     const stalled=getTime()-this.lastProgress;
-    if(stalled>=14)this.note='Try Rescan room or Place myself.';
+    if(stalled>=14)this.note=this.scanner.diagnostics().observations===0?'No nearby surfaces yet. Move closer to an object, then look across it.':'Look at another edge or corner, or try Rescan room.';
     else if(stalled>=7)this.note='Look up, then sweep across the room.';
-    else if(this.points.length===0)this.note='Slowly look across nearby furniture.';
+    else if(this.points.length===0)this.note='Look across nearby objects, edges and corners.';
     else if(this.points.length===1)this.note='Turn toward a different corner.';
     else this.note='One more spot. Look higher or farther.';
     if(this.pending||getTime()<this.nextQuery)return;
     const camera=WorldCameraFinderProvider.getInstance().getComponent();
-    const origin=camera.getTransform().getWorldPosition();let end=camera.screenSpaceToWorldSpace(this.scanner.next(),650);
+    const origin=camera.getTransform().getWorldPosition();
+    // Depth queries only work inside the camera view. Keep this ray on screen;
+    // use a separate wider ray for the reconstructed mesh.
+    const end=camera.screenSpaceToWorldSpace(this.scanner.next(),650);let meshEnd=end;
     // Sample a wider band of nearby furniture, including tops outside the narrow display field.
     if(this.points.length===0){
       const k=this.probe++%54,x=[-1.4,-1,-.7,-.35,0,.35,.7,1,1.4][k%9],y=[-.55,-.75,-.85,-.95,-1.15,-.35][Math.floor(k/9)];
-      end=origin.add(camera.getTransform().getWorldRotation().multiplyVec3(new vec3(x,y,-1).normalize()).uniformScale(650));
+      meshEnd=origin.add(camera.getTransform().getWorldRotation().multiplyVec3(new vec3(x,y,-1).normalize()).uniformScale(650));
     }
     const epoch=this.epoch;this.pending=true;this.nextQuery=getTime()+0.2;
     this.session.hitTest(origin,end,hit=>{
@@ -127,7 +143,7 @@ export class RoomInvadersPlacement {
           const floor=tracking.raycastWorldMesh(this.setupOrigin,this.setupOrigin.add(new vec3(0,-650,0)));
           if(floor.length&&floor[0].normal.y>.7){this.floorY=floor[0].position.y;this.scanner.setFloor(this.floorY);console.log('RoomInvaders measured floor '+this.floorY);}
         }
-        const hits=tracking.raycastWorldMesh(origin,end);if(hits.length)this.scanner.accept(hits[0].position,hits[0].normal,this.setupOrigin);
+        const hits=tracking.raycastWorldMesh(origin,meshEnd);if(hits.length)this.scanner.accept(hits[0].position,hits[0].normal,this.setupOrigin);
       }
       const candidate=this.scanner.candidate(this.points,this.setupOrigin);
       if(candidate)this.commit(candidate.position,candidate.normal,origin);
@@ -164,5 +180,5 @@ export class RoomInvadersPlacement {
     }
   }
   showMarkers(show:boolean):void {this.marks.forEach((m,i)=>m.enabled=show&&i<this.points.length);}
-  destroy():void {this.active=false;this.epoch++;this.session?.stop();this.cursor.destroy();this.marks.forEach(m=>m.destroy());}
+  destroy():void {this.depthCover.destroy();this.active=false;this.epoch++;this.session?.stop();this.cursor.destroy();this.marks.forEach(m=>m.destroy());}
 }
