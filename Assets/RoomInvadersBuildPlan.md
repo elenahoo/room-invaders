@@ -1,3 +1,7 @@
+# Historical implementation record
+
+The October 24 sections below describe earlier builds. For the current November 6 build, final demo and verification, see [the project README](../README.md) and [final local review](../devpost/final-local-review.md). Later rooftop masking, roaming and scoring revisions supersede the older implementation details below.
+
 # Occlusion update — 2026-10-24
 
 Active implementation: native World Mesh + Occluder material at render order -100, with depth-tested creature materials. Full-size monsters animate from behind the selected surface into view; no scale-from-zero appearance. Placement and shot visibility use reconstructed mesh hits when available. Both behind/front shot checks and the full rescue scenario passed. Screenshot occlusion-verified-2026-10-24.jpg demonstrates hidden/partial/front test fixtures. The unsuccessful camera World Depth Texture approach was removed. No physical-device performance claims; no spending or submission.

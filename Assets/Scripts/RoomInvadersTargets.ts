@@ -54,7 +54,7 @@ export class RoomInvadersTargets {
       // Full-size creature travels from behind the physical surface into view. Depth handles masking.
       const reveal=peek?0:emergenceReveal(progress);
       const base=this.anchors[i].getTransform().getWorldPosition();
-      const offset=this.normalAt(i).uniformScale(-80*(1-reveal)).add(new vec3(0,this.kindAt(i)==='ceiling'?0:(this.normalAt(i).y>.5?[32,16,40][i]:0)*reveal,0));
+      const offset=this.kindAt(i)==='ledge'?new vec3(0,-300*(1-reveal),0):this.normalAt(i).uniformScale(-80*(1-reveal)).add(new vec3(0,this.kindAt(i)==='ceiling'?0:(this.normalAt(i).y>.5?[32,16,40][i]:0)*reveal,0));
       t.root.getTransform().setWorldPosition(base.add(offset));
       // Overhead creatures must fit the glasses view at close ceiling distances.
       const scale=this.kindAt(i)==='ceiling'?.55:1;

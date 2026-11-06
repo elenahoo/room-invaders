@@ -1,6 +1,8 @@
 # Outdoor update · November 4, 2026
 
-The new local review video is `Room-Invaders-final-demo.mp4` (about 1:41). It retains the complete earlier 77-second two-room edit, then adds a 24.2-second Sunlit Outdoor chapter. The full outdoor Preview frame is preserved with side margins because its capture aspect ratio differs from the earlier wide recordings. There is no crop or stretch of the gameplay.
+This is the historical November 4 update. Its demo was about 1:41; the current `Room-Invaders-final-demo.mp4` is the November 6 2:01 final-mask edit described in [final-local-review.md](final-local-review.md). The following capture and test results belong to the November 4 build.
+
+The November 4 video was about 1:41. It retains the complete earlier 77-second two-room edit, then adds a 24.2-second Sunlit Outdoor chapter. The full outdoor Preview frame is preserved with side margins because its capture aspect ratio differs from the earlier wide recordings. There is no crop or stretch of the gameplay.
 
 The outdoor chapter includes a fast complete turn around the plaza, followed by Wraith, Hound and Leech encounters at several measured column/doorway positions and six successful pinch captures. `edit.json` contains the source cuts and 13 event-timed sound cues. `Sunlit-Outdoor-take1.mp4` is the untouched native capture; the chosen footage ends before the later escape/paused tail.
 

@@ -68,10 +68,11 @@ export class RoomInvadersPlacement {
     this.nextQuery=0;this.lastInput=getTime();
   }
   update():void {
+    const view=WorldCameraFinderProvider.getInstance().getComponent();
+    this.depthCover.update(view,this.scanner.diagnostics().groundEstimate);
     if(this.automatic&&this.session){
       const camera=WorldCameraFinderProvider.getInstance().getComponent();
       this.roaming.sample(camera,this.scanner.diagnostics().groundEstimate);
-      this.depthCover.update(camera,this.scanner.diagnostics().groundEstimate);
       if(!this.ready&&getTime()-this.setupStarted>8){
         const sites=this.roaming.bootstrap(this.points);
         for(const s of sites){
@@ -163,6 +164,7 @@ export class RoomInvadersPlacement {
     if(this.automatic&&!wide&&!this.scanner.aboveGround(p))return;
     if(!wide&&!distanceFits(p,this.setupOrigin,this.points)){this.note=this.points.length===0?'Look down toward a surface 1–2.5 m away.':'Find a farther surface 3–6 m away.';return;}
     if(this.points.some(q=>q.sub(p).length<75)){this.note='Pick a different spot, at least 75 cm from the others.';return;}
+    this.depthCover.focus(p);
     this.roaming.add(p,n,n.y<-.55?'ceiling':n.y>.55?'surface':'cover');
     const i=this.points.length;this.points.push(p);this.normal.push(n);this.lastProgress=getTime();
     this.alignMarker(this.marks[i],p,n);this.marks[i].enabled=true;

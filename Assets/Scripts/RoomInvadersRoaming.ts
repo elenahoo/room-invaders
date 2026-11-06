@@ -11,7 +11,7 @@ export class RoomInvadersRoaming {
  add(p:vec3,n:vec3,kind:string):void{
   if(![p.x,p.y,p.z,n.x,n.y,n.z].every(Number.isFinite)||n.length<.8)return;
   const old=this.sites.find(s=>s.p.sub(p).length<55&&s.n.dot(n)>.75);
-  if(old){old.seen=getTime();return;}
+  if(old){old.seen=getTime();if(kind==='ledge'&&(old.kind!=='ledge'||p.y>old.p.y+1)){old.kind=kind;old.p=p;old.n=n.normalize();}return;}
   if(this.sites.length>=36||this.sites.filter(s=>s.kind===kind).length>=12)return;
   this.sites.push({key:this.serial++,p,n:n.normalize(),kind,seen:getTime(),uses:0});
  }
@@ -75,7 +75,7 @@ export class RoomInvadersRoaming {
   for(const e of s.enemies)if(!this.seen.has(e.id)){
    const occupied=Array.from(this.assigned.values());
    let choices=this.sites.filter(v=>getTime()-v.seen<180&&v.p.sub(camera).length>=100&&v.p.sub(camera).length<=650&&occupied.every(a=>a.p.sub(v.p).length>=75)).filter(v=>{
-    const end=v.p.add(v.n.uniformScale(v.kind==='ceiling'?55:v.n.y>.5?14:55)),distance=end.sub(camera).length;
+    const end=v.kind==='ledge'?v.p.sub(new vec3(v.n.x,0,v.n.z).normalize().uniformScale(120)).add(new vec3(0,200,0)):v.p.add(v.n.uniformScale(v.kind==='ceiling'?55:v.n.y>.5?14:55)),distance=end.sub(camera).length;
     if(distance<55)return false;
     const hits=tracking?.raycastWorldMesh(camera,end);
     return !hits?.length||hits[0].position.sub(camera).length+3>=distance;
@@ -84,7 +84,7 @@ export class RoomInvadersRoaming {
    const ranked=choices.map(v=>({v,rank:this.history.filter(h=>h.kind===v.kind).length*10+v.uses+(this.history.slice(-1)[0]?.kind===v.kind?3:0)+Math.random()})).sort((a,b)=>a.rank-b.rank);
    const site=ranked[0]?.v;if(!site)continue;
    this.seen.add(e.id);site.uses++;this.recent.push(site.key);this.assigned.set(e.spawn,site);
-   const base=site.p.add(site.n.uniformScale(site.kind==='ceiling'?55:site.n.y>.5?14:55));
+   const base=site.kind==='ledge'?site.p.sub(new vec3(site.n.x,0,site.n.z).normalize().uniformScale(120)).add(new vec3(0,200,0)):site.p.add(site.n.uniformScale(site.kind==='ceiling'?55:site.n.y>.5?14:55));
    const tr=this.anchors[e.spawn].getTransform();tr.setWorldPosition(base);
    const facing=new vec3(camera.x-base.x,0,camera.z-base.z);
    if(facing.length>.01)tr.setWorldRotation(quat.lookAt(facing.normalize(),vec3.up()));

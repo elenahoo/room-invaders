@@ -7,7 +7,7 @@ approval: "yes looks good — user approval in this chat"
 
 # Design brief: Room Invaders
 
-This is the approved October 28 design record. See **Implemented revisions, October 31 and November 3** at the end for the current scan, spawn and scoring behavior.
+This is the approved October 28 design record. The initial scope below is historical. See the dated implemented revisions at the end for current scan, spawn, scoring and outdoor behavior.
 
 This formal plan-lens review follows the initial prototype. It does not claim the original build was preceded by this interview. The October 28 tests and recording cover the earlier cartoon build; the approved revision has now been implemented and tested. See revision evidence under room-invaders/docs/2026-10-28/revision; a 123.73-second local review playthrough has been recorded. Continue in the same chat, without subagents, spending, publishing or submission.
 
@@ -64,7 +64,7 @@ Each can be checked in Lens Studio Preview:
 5. Pause freezes time and warning behavior; restart clears encounter state and stale sounds while keeping selected points. Missed rescue and shield loss show their correct outcomes.
 
 ## Out of scope
-- Outdoor/city encounters or the other five reference monster types.
+- Outdoor/city encounters were outside the initial October 28 scope; the later authorized outdoor revisions below supersede that limit. The other five reference monster types remain deferred.
 - Furniture-name recognition, live camera AI, heat tracking, elemental combat or abilities inferred from reference-card text.
 - Multiplayer, persistent anchors, custom finger-gun gestures and recording/identifying people.
 - Spending, paid generation, uploads, publishing and competition submission.
@@ -74,7 +74,7 @@ Each can be checked in Lens Studio Preview:
 - Room reconstruction may miss thin, moving, reflective or individual object outlines; some supplied-room surfaces may be unsuitable for the requested distances.
 - Far targets may be small, and additive displays can hide dark detail. Preserve bright silhouette/eye/material cues and check readability without claiming device comfort.
 - More realistic local procedural art may not match the cinematic reference's detail. Show the actual result for review rather than label it photorealistic.
-- Physical tracking, sound localization, comfort and on-device performance remain feel unproven.
+- Physical tracking, sound localization, comfort and on-device performance remain unproven.
 - No personal learner reflection has been supplied. A factual development-lessons note can be used without blocking this plan. Final brief approved by the learner in this chat.
 
 ## Build notes for CLAD
@@ -111,3 +111,11 @@ Automatic setup now counts three measured starting sites and then continues surv
 
 ## November 4 local outdoor revision
 The authorized outdoor scan fix supplements incomplete reconstructed meshes with confirmed, bounded depth patches from actual WorldQuery samples. These patches also mask emergence and block covered shots. Nearby opaque columns and edges can now provide roaming sites after the player looks around; unknown gaps and glass are not filled with invented geometry. Pip and the three locks are checked for clearance in front of measured cover. The local demo now retains the earlier indoor footage and appends a Sunlit Outdoor chapter, with the game’s own event-timed music/effects. Physical-glasses verification remains outstanding. No publication, submission or spending is authorized.
+
+## November 6 final local revision
+The user requested roof-edge masking fixes, additional building-top appearances and a final short local demo. The current build refines measured solid-to-sky boundaries, retains denser local depth patches, handles curved surfaces and uses a two-sided depth-only material. Elevated ledges participate in roaming, and those monsters rise from behind the measured edge. The 2:01 final local demo replaces only the rooftop ending with footage captured after the last masking adjustment; earlier footage is retained. A longer continuous recording is supplementary evidence, not the selected submission demo.
+
+All three Preview environments completed full 90-second rounds with Pip saved in the final local build. Those captures used normal automated SIK inputs, with automatic indoor setup and manual outdoor fallback. Physical-glasses behavior remains untested. The latest source, video and description are synchronized locally; no new publication or submission is authorized.
+
+## November 6 submission update authorization
+After approving the final local package, the user authorized updating the existing GitHub repository and Devpost description, using their already updated video URL. The final build is unchanged from the verified local package. Superseded local demo videos were removed to recover disk space. No spending is authorized.

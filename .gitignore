@@ -15,3 +15,6 @@ leaf_plugin_settings.json
 .cursor*
 AGENTS.md
 CLAUDE.md
+
+# Demo is hosted at the URL in devpost/demo.md; retain local export separately.
+devpost/Room-Invaders-final-demo.mp4
